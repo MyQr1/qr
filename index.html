@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <title>Certificate</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f8;
+      --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+      --toolbar-bg: rgba(255, 255, 255, 0.92);
+      --toolbar-border: #e2e8f0;
+      --icon-color: #334155;
+      --icon-hover: #0f172a;
+      --btn-hover-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+
+    /* Discreet Floating Controls */
+    .controls-bar {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--toolbar-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--toolbar-border);
+      border-radius: 30px;
+      padding: 5px 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      z-index: 1000;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .ctrl-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: var(--icon-color);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .ctrl-btn:hover {
+      background-color: var(--btn-hover-bg);
+      color: var(--icon-hover);
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.95);
+    }
+
+    .ctrl-btn svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
+
+    .divider {
+      width: 1px;
+      height: 20px;
+      background-color: var(--toolbar-border);
+      margin: 0 2px;
+    }
+
+    /* Main Certificate Stage */
+    .viewport-container {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 16px;
+    }
+
+    .certificate-wrapper {
+      position: relative;
+      max-width: 860px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform-origin: center center;
+      transition: transform 0.15s ease-out;
+    }
+
+    /* The Pure Image Element - Completely unmodified */
+    #certificate-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      object-fit: contain;
+      border-radius: 2px;
+      box-shadow: var(--card-shadow);
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: auto;
+    }
+
+    /* Missing Image Notice if not placed in folder */
+    .missing-file-alert {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 36px 28px;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+    }
+
+    .missing-file-alert h2 {
+      font-size: 19px;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+
+    .missing-file-alert p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    .file-input-label {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #0f172a;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #manual-file-input {
+      display: none;
+    }
+
+    /* Print Optimization - Certificate Only */
+    @media print {
+      body {
+        background: transparent !important;
+      }
+      .controls-bar, .missing-file-alert {
+        display: none !important;
+      }
+      .viewport-container {
+        padding: 0 !important;
+        min-height: auto !important;
+      }
+      .certificate-wrapper {
+        transform: none !important;
+        max-width: 100% !important;
+      }
+      #certificate-image {
+        box-shadow: none !important;
+        width: 100% !important;
+        max-height: 100vh !important;
+      }
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 640px) {
+      .controls-bar {
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      }
+      .viewport-container {
+        padding: 24px 10px 80px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Discreet Floating Controls -->
+  <nav class="controls-bar" aria-label="Viewing Controls">
+    <button id="btnZoomOut" class="ctrl-btn" title="Zoom Out" aria-label="Zoom Out">
+      <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+    </button>
+    <button id="btnReset" class="ctrl-btn" title="Fit to Screen" aria-label="Fit to Screen">
+      <svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4V4zm14 0h2v6h-2V6h-4V4h4zm2 16h-6v-2h4v-4h2v6zM4 14h2v4h4v2H4v-6z"/></svg>
+    </button>
+    <button id="btnZoomIn" class="ctrl-btn" title="Zoom In" aria-label="Zoom In">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </button>
+    <div class="divider"></div>
+    <a id="btnDownload" class="ctrl-btn" href="certificate.jpg" download="certificate.jpg" title="Download Original Certificate" aria-label="Download Certificate">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    </a>
+  </nav>
+
+  <!-- Center Stage -->
+  <main class="viewport-container" id="viewport">
+    <div class="certificate-wrapper" id="certWrapper">
+      <!-- 
+        STATIC IMAGE ASSET:
+        Loads the untouched, pixel-perfect original file.
+      -->
+      <img 
+        id="certificate-image" 
+        src="o.jpeg" 
+        alt="Certificate"
+      />
+
+      <!-- Prompt shown only if the image file hasn't been placed in the folder yet -->
+      <div id="missingAlert" class="missing-file-alert">
+        <h2>Certificate Image Not Found</h2>
+        <p>
+          Save your certificate file as <strong>certificate.jpg</strong> in the same directory as this HTML file, or pick it below to view immediately:
+        </p>
+        <label for="manual-file-input" class="file-input-label">Select Certificate File</label>
+        <input type="file" id="manual-file-input" accept="image/*" />
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      const img = document.getElementById('certificate-image');
+      const wrapper = document.getElementById('certWrapper');
+      const missingAlert = document.getElementById('missingAlert');
+      const fileInput = document.getElementById('manual-file-input');
+      const btnDownload = document.getElementById('btnDownload');
+      const btnZoomIn = document.getElementById('btnZoomIn');
+      const btnZoomOut = document.getElementById('btnZoomOut');
+      const btnReset = document.getElementById('btnReset');
+
+      let currentZoom = 1.0;
+      const minZoom = 0.6;
+      const maxZoom = 2.5;
+      const zoomStep = 0.2;
+
+      function updateZoom(newZoom) {
+        currentZoom = Math.min(Math.max(newZoom, minZoom), maxZoom);
+        wrapper.style.transform = `scale(${currentZoom})`;
+      }
+
+      btnZoomIn.addEventListener('click', () => updateZoom(currentZoom + zoomStep));
+      btnZoomOut.addEventListener('click', () => updateZoom(currentZoom - zoomStep));
+      btnReset.addEventListener('click', () => updateZoom(1.0));
+
+      // Double-click/tap to toggle 1.6x inspection zoom
+      img.addEventListener('dblclick', () => {
+        if (currentZoom === 1.0) {
+          updateZoom(1.6);
+        } else {
+          updateZoom(1.0);
+        }
+      });
+
+      // Keyboard shortcuts (+, -, 0)
+      window.addEventListener('keydown', (e) => {
+        if (e.key === '+' || e.key === '=') updateZoom(currentZoom + zoomStep);
+        if (e.key === '-' || e.key === '_') updateZoom(currentZoom - zoomStep);
+        if (e.key === '0') updateZoom(1.0);
+      });
+
+      // Error handler: If 'certificate.jpg' isn't found, check for 'certificate.png'
+      let triedPng = false;
+      img.addEventListener('error', () => {
+        if (!triedPng) {
+          triedPng = true;
+          img.src = 'certificate.png';
+          btnDownload.href = 'certificate.png';
+          btnDownload.download = 'certificate.png';
+        } else {
+          img.style.display = 'none';
+          missingAlert.style.display = 'block';
+        }
+      });
+
+      // Local selection fallback (runs entirely in browser)
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const objectUrl = URL.createObjectURL(file);
+          img.src = objectUrl;
+          img.style.display = 'block';
+          missingAlert.style.display = 'none';
+          btnDownload.href = objectUrl;
+          btnDownload.download = file.name;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
